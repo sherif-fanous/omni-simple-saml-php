@@ -4,7 +4,9 @@
 
 Both [Authentik](https://goauthentik.io/) and [Keycloak](https://www.keycloak.org/) are powerful and popular IdPs with self-hosting/homelabers but require substantial time and effort to deploy and setup if you're only doing this to use Omni.
 
-This repo provides a [compose](https://docs.docker.com/compose/) file that bundles Omni with [SimpleSAMLphp](https://simplesamlphp.org/) a super light weight IdP and only requres you to perform a few simple steps to get Omni running
+The Omni Slack channel has multiple message requesting that Omni add support for "Internal Auth" and while the wonderful folks at [Sidero Labs](https://www.siderolabs.com/) have indicated that this is on their roadmap, it is yet to be implemented.
+
+This repo provides a [compose](https://docs.docker.com/compose/) file that bundles Omni with [SimpleSAMLphp](https://simplesamlphp.org/) a super light weight IdP and only requres you to perform a few simple steps to get Omni running. This is probably the closest thing one can get to "Internal Auth" until Omni adds support for it.
 
 ## Instructions
 
