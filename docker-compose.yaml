@@ -1,0 +1,59 @@
+---
+services:
+  omni:
+    cap_add:
+      - NET_ADMIN
+    command: >-
+      --account-id=${OMNI_ACCOUNT_UUID}
+      --advertised-api-url=${OMNI_FQDN}
+      --advertised-kubernetes-proxy-url=${OMNI_FQDN}:8095
+      --auth-saml-enabled=true
+      --auth-saml-url=${OMNI_FQDN}:8443/simplesaml/module.php/saml/idp/metadata
+      --bind-addr=0.0.0.0:443
+      --cert=/tls.crt
+      --debug
+      --event-sink-port=8091
+      --initial-users=${OMNI_USER_EMAIL}
+      --k8s-proxy-bind-addr=0.0.0.0:8095
+      --key=/tls.key
+      --machine-api-bind-addr=0.0.0.0:8090
+      --machine-api-cert=/tls.crt
+      --machine-api-key=/tls.key
+      --name=omni
+      --private-key-source=file:///omni.asc
+      --siderolink-api-advertised-url=${OMNI_FQDN}:8090
+      --siderolink-wireguard-advertised-addr=${OMNI_IP}:50180
+    container_name: omni
+    env_file:
+      - path: .env
+        required: true
+    image: ghcr.io/siderolabs/omni:v0.34.0
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - ./certificate/${TLS_CERT_FILE}:/tls.crt:ro
+      - ./certificate/${TLS_KEY_FILE}:/tls.key:ro
+      - ./omni.asc:/omni.asc
+      - /dev/net/tun:/dev/net/tun
+      - etcd:/_out/etcd
+  simplesamlphp:
+    container_name: simplesamlphp
+    env_file:
+      - path: .env
+        required: true
+    image: cirrusid/simplesamlphp:v2.0.7
+    ports:
+      - 8443:443
+    restart: unless-stopped
+    volumes:
+      - ./certificate:/var/simplesamlphp/cert:ro
+      - ./certificate/${TLS_CERT_FILE}:/etc/ssl/certs/${APACHE_CERT_NAME}.pem:ro
+      - ./certificate/${TLS_KEY_FILE}:/etc/ssl/private/${APACHE_CERT_NAME}.key:ro
+      - ./simplesamlphp/config/authsources.php:/var/simplesamlphp/config/authsources.php:ro
+      - ./simplesamlphp/config/config-override.php:/var/simplesamlphp/config/config-override.php:ro
+      - ./simplesamlphp/config/saml20-idp-hosted.php:/var/simplesamlphp/metadata/saml20-idp-hosted.php:ro
+      - ./simplesamlphp/config/saml20-sp-remote.php:/var/simplesamlphp/metadata/saml20-sp-remote.php:ro
+
+volumes:
+  etcd:
+    external: true
