@@ -24,10 +24,7 @@ services:
       --siderolink-api-advertised-url=${OMNI_FQDN}:8090
       --siderolink-wireguard-advertised-addr=${OMNI_IP}:50180
     container_name: omni
-    env_file:
-      - path: .env
-        required: true
-    image: ghcr.io/siderolabs/omni:v0.34.0
+    image: ghcr.io/siderolabs/omni:$OMNI_IMAGE_TAG
     network_mode: host
     restart: unless-stopped
     volumes:
@@ -38,10 +35,17 @@ services:
       - etcd:/_out/etcd
   simplesamlphp:
     container_name: simplesamlphp
-    env_file:
-      - path: .env
-        required: true
-    image: cirrusid/simplesamlphp:v2.0.7
+    environment:
+      - APACHE_CERT_NAME=$APACHE_CERT_NAME
+      - OMNI_FQDN=$OMNI_FQDN
+      - OMNI_USER_EMAIL=$OMNI_USER_EMAIL
+      - OMNI_USER_PASSWORD=$OMNI_USER_PASSWORD
+      - OMNI_USER_USERNAME=$OMNI_USER_USERNAME
+      - SSP_ADMIN_PASSWORD=$SSP_ADMIN_PASSWORD
+      - SSP_SECRET_SALT=$SSP_SECRET_SALT
+      - TLS_CERT_FILE=$TLS_CERT_FILE
+      - TLS_KEY_FILE=$TLS_KEY_FILE
+    image: cirrusid/simplesamlphp:$SSP_IMAGE_TAG
     ports:
       - 8443:443
     restart: unless-stopped
